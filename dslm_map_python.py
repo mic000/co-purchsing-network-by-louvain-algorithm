@@ -37,8 +37,8 @@ def compute_map_equation_delta(
 
   # Map Equation Delta: Change in entropy contribution
   # We want to MINIMIZE code length, so a positive delta here means a reduction.
-  term_before = nplogp(cut_t / m2) - 2 * nplogp((cut_t + vol_t) / m2)
-  term_after = nplogp(cut_t_plus_v / m2) - 2 * nplogp((cut_t_plus_v + vol_t_plus_v) / m2)
+  term_before = -2 * nplogp(cut_t / m2) + nplogp((cut_t + vol_t) / m2)
+  term_after = -2 * nplogp(cut_t_plus_v / m2) + nplogp((cut_t_plus_v + vol_t_plus_v) / m2)
     
   return term_before - term_after
 
@@ -73,18 +73,18 @@ def dslm_local_moving_map_python(
             max_delta = delta
             best_C = target_C
                 
-          if best_C != current_C:
-            new_moves[v] = best_C
+        if best_C != current_C:
+          new_moves[v] = best_C
 
-        # Apply moves
-        for v, new_C in new_moves.items():
-          clusters[v] = new_C
-          moved_count += 1
+      # Apply moves
+      for v, new_C in new_moves.items():
+        clusters[v] = new_C
+        moved_count += 1
 
-      print(f"  Round {round_num + 1}: {moved_count} nodes moved")
+    print(f"  Round {round_num + 1}: {moved_count} nodes moved")
 
-      if moved_count == 0:
-        print(f"  Converged after {round_num + 1} rounds")
-        break
-            
-    return clusters
+    if moved_count == 0:
+      print(f"  Converged after {round_num + 1} rounds")
+      break
+
+  return clusters
