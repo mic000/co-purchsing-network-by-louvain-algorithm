@@ -1,0 +1,6 @@
+networkx==3.4.2
+numpy==2.2.6
+psutil==7.2.2
+py4j==0.10.9.9
+pyspark==4.1.1
+python-louvain==0.16
