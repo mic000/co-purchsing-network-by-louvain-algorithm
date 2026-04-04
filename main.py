@@ -3,7 +3,8 @@ import time
 import os
 import sys
 import community as community_louvain
-# from types_and_utils import compute_modularity
+from collections import Counter
+from sklearn.metrics import adjusted_rand_score
 from dslm_mod_python import dslm_local_moving_mod_python
 from dslm_map_python import dslm_local_moving_map_python
 from dslm_mod_pyspark import dslm_local_moving_mod_pyspark
@@ -22,6 +23,15 @@ if __name__ == "__main__":
         continue
       u, v = map(int, line.strip().split())
       G.add_edge(u, v)
+
+  # Load ground truth communities
+  ground_truth = {}
+  with open("com-amazon.all.dedup.cmty.txt") as f:
+    for i, line in enumerate(f):
+      for node in line.strip().split():
+        node = int(node)
+        if node not in ground_truth:
+          ground_truth[node] = i
 
   # chosen the max number connected nodes
   largest_cc_nodes = max(nx.connected_components(G), key=len)
@@ -91,6 +101,22 @@ if __name__ == "__main__":
   # Q_spark = compute_modularity(result_spark, G)
   Q_spark = community_louvain.modularity(result_spark, G)
   print(f"PySpark: {num_communities} communities, Q = {Q_spark:.4f}, Time = {elapsed:.2f}s")
+  
+  # ----- ground truth calculation -----
+  # Only compare nodes that exist in both
+  common_nodes = sorted(set(ground_truth.keys()) & set(result_spark.keys()))
+  true_labels = [ground_truth[n] for n in common_nodes]
+  pred_labels = [result_spark[n] for n in common_nodes]
+
+  ari_mod = adjusted_rand_score(true_labels, pred_labels)
+  print(f"ARI with ground truth of DSLM Mod : {ari_mod:.4f}")
+
+  # clustering granuality
+  sizes = Counter(result_spark.values())
+  print(f"Smallest community: {min(sizes.values())}")
+  print(f"Largest community: {max(sizes.values())}")
+  print(f"Average community size: {sum(sizes.values()) / len(sizes):.1f}")
+  print(f"Median community size: {sorted(sizes.values())[len(sizes)//2]}")
   # end of :Pyspark Mod
 
   # Pyspark Map -> calculate all
@@ -103,6 +129,22 @@ if __name__ == "__main__":
   # Q_spark = compute_modularity(result_spark, G)
   Q_spark = community_louvain.modularity(result_spark, G)
   print(f"PySpark: {num_communities} communities, Q = {Q_spark:.4f}, Time = {elapsed:.2f}s")
+
+  # ----- ground truth calculation -----
+  # Only compare nodes that exist in both
+  common_nodes = sorted(set(ground_truth.keys()) & set(result_spark.keys()))
+  true_labels = [ground_truth[n] for n in common_nodes]
+  pred_labels = [result_spark[n] for n in common_nodes]
+
+  ari_map = adjusted_rand_score(true_labels, pred_labels)
+  print(f"ARI with ground truth of DSLM Map : {ari_map:.4f}")
+
+  # clustering granuality
+  sizes = Counter(result_spark.values())
+  print(f"Smallest community: {min(sizes.values())}")
+  print(f"Largest community: {max(sizes.values())}")
+  print(f"Average community size: {sum(sizes.values()) / len(sizes):.1f}")
+  print(f"Median community size: {sorted(sizes.values())[len(sizes)//2]}")
   # end of :Pyspark Map
 
   # stop spark context

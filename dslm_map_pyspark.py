@@ -1,8 +1,7 @@
 import math
 from typing import List, Tuple, Dict
 from types_and_utils import (
-  NodeID, ClusterID, Clustering, ClusterVolumes,
-  NodeDegrees, NeighborClusterEdges, EdgeList,
+  NodeID, ClusterID, Clustering, ClusterVolumes, EdgeList,
   is_active, count_edges_to_clusters, compute_cluster_volumes
 )
 
@@ -39,7 +38,7 @@ def compute_best_move_map_distributed(
   deg_v = len(neighbors)
   m2 = total_volume
 
-  edges_to_cluster: NeighborClusterEdges = count_edges_to_clusters(neighbors, clusters)
+  edges_to_cluster = count_edges_to_clusters(neighbors, clusters)
 
   edges_to_current = edges_to_cluster.get(current_cluster, 0)
 
@@ -101,21 +100,21 @@ def dslm_local_moving_map_pyspark(
     .mapValues(list) \
     .cache()
 
-  node_degrees: NodeDegrees = dict(adj_rdd.mapValues(len).collect())
-  total_volume: int = sum(node_degrees.values())
+  node_degrees = dict(adj_rdd.mapValues(len).collect())
+  total_volume = sum(node_degrees.values())
 
-  clusters: Clustering = {node: node for node in node_degrees}
+  clusters = {node: node for node in node_degrees}
 
   print(f"PySpark DSLM-Map: {len(node_degrees)} nodes, vol(V)={total_volume}")
 
   for round_num in range(max_rounds):
-    moved_count: int = 0
+    moved_count = 0
 
     # Precompute cluster volumes and cuts for this round
-    cluster_vol: ClusterVolumes = compute_cluster_volumes(clusters, node_degrees)
+    cluster_vol = compute_cluster_volumes(clusters, node_degrees)
 
     clusters_bc_temp = sc.broadcast(clusters)
-    cluster_cut: Dict[ClusterID, int] = compute_cluster_cuts(adj_rdd, clusters_bc_temp)
+    cluster_cut = compute_cluster_cuts(adj_rdd, clusters_bc_temp)
     clusters_bc_temp.unpersist()
 
     for sub_round in range(num_sub_rounds):
@@ -124,10 +123,10 @@ def dslm_local_moving_map_pyspark(
       cluster_cut_bc = sc.broadcast(cluster_cut)
       total_vol_bc = sc.broadcast(total_volume)
 
-      rn: int = round_num
-      sr: int = sub_round
-      nsr: int = num_sub_rounds
-      sd: int = seed
+      rn = round_num
+      sr = sub_round
+      nsr = num_sub_rounds
+      sd = seed
 
       def process_node(
         record: Tuple[NodeID, List[NodeID]]
@@ -147,13 +146,13 @@ def dslm_local_moving_map_pyspark(
           seed=sd
         )
 
-      new_assignments: Clustering = dict(adj_rdd.map(process_node).collect())
+      new_assignments = dict(adj_rdd.map(process_node).collect())
 
       for node, new_c in new_assignments.items():
-        old_c: ClusterID = clusters[node]
+        old_c = clusters[node]
         if new_c != old_c:
           moved_count += 1
-          deg: int = node_degrees[node]
+          deg = node_degrees[node]
           cluster_vol[old_c] -= deg
           cluster_vol[new_c] += deg
 

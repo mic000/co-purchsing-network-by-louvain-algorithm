@@ -1,7 +1,6 @@
 import networkx as nx
 import math
 import random
-from typing import Dict, List, Set
 from types_and_utils import NodeID, ClusterID, Clustering, is_active
 
 def nplogp(p: float) -> float:
