@@ -5,7 +5,7 @@ import sys
 import community as community_louvain
 from collections import Counter
 from infomap import Infomap
-from plotting import algorithm_comparison_graph
+from plotting import algorithm_comparison_graph, community_distribution, detected_community
 from sklearn.metrics import adjusted_rand_score
 from dslm_mod_python import dslm_local_moving_mod_python
 from dslm_map_python import dslm_local_moving_map_python
@@ -98,7 +98,7 @@ if __name__ == "__main__":
   # --- Sequential Louvain (Baseline for DSLM Mod) ---
   print("\n=== Sequential Louvain (Library Baseline) ===")
   start_louvain = time.time()
-  partition_louvain = community_louvain.best_partition(G)
+  partition_louvain = community_louvain.best_partition(G, random_state=42)
   time_louvain = time.time() - start_louvain
 
   Q_louvain = community_louvain.modularity(partition_louvain, G)
@@ -208,7 +208,14 @@ if __name__ == "__main__":
   # --- end of Pyspark Map ---
 
   # Plotting
+  # comparison graph
   algorithm_comparison_graph(time_louvain,num_comm_louvain,Q_louvain,sizes_louvain, time_infomap, num_comm_infomap, Q_infomap, sizes_infomap, time_dslm_mod, num_comm_dslm_mod, Q_dslm_mod, sizes_dslm_mod, time_dslm_map, num_comm_dslm_map, Q_dslm_map, sizes_dslm_map)
+
+  # COMMUNITY SIZE DISTRIBUTION — ALL 4 METHODS
+  community_distribution(sizes_louvain, sizes_infomap, sizes_dslm_mod, sizes_dslm_map)
+
+  # Community Detection
+  detected_community(result_dslm_mod, result_dslm_map, partition_louvain, partition_infomap, G)
 
   # stop spark context
   sc.stop()
