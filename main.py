@@ -17,7 +17,7 @@ os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 if __name__ == "__main__":
-  edge_file = "com-amazon.ungraph.txt"
+  edge_file = "data/com-amazon.ungraph.txt"
   G = nx.Graph()
   with open(edge_file, "r") as f:
     for line in f:
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
   # Load ground truth communities
   ground_truth = {}
-  with open("com-amazon.all.dedup.cmty.txt") as f:
+  with open("data/com-amazon.all.dedup.cmty.txt") as f:
     for i, line in enumerate(f):
       for node in line.strip().split():
         node = int(node)
