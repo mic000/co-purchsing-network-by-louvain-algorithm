@@ -18,14 +18,6 @@ Install all dependencies with:
 pip install -r requirements.txt
 ```
 
-**`requirements.txt`**:
-```
-networkx==3.2.1
-python-louvain==0.16
-infomap==2.6.1
-matplotlib==3.8.2
-```
-
 ---
 
 ## Dataset
@@ -40,7 +32,7 @@ This project uses the **Amazon co-purchase graph** from the [SNAP Large Network 
 
 > The dataset is ~25 MB compressed (~50 MB unzipped) and is excluded from this repository via `.gitignore`.
 
-| Property | Value |
+| Property | Description |
 |---|---|
 | Nodes | 334,863 |
 | Edges | 925,872 |
@@ -48,3 +40,24 @@ This project uses the **Amazon co-purchase graph** from the [SNAP Large Network 
 | Description | Products as nodes; co-purchased products connected by edges |
 
 ---
+
+## Reference
+
+```bibtex
+@inproceedings{hamann2018distributed,
+  title     = {Distributed Graph Clustering Using Modularity and Map Equation},
+  author    = {Hamann, Michael and Strasser, Ben and Wagner, Dorothea and Zeitz, Tim},
+  booktitle = {Euro-Par 2018: Parallel Processing},
+  series    = {LNCS},
+  volume    = {11014},
+  pages     = {688--702},
+  year      = {2018},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-319-96983-1_49}
+}
+```
+
+---
+
+## License
+The referenced paper belongs to the original authors.
