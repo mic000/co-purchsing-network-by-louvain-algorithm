@@ -1,3 +1,10 @@
+# Distributed Graph Clustering: Modularity vs Map Equation and Implementation on Real-World Dataset
+
+> A study and single-machine implementation of **DSLM-Mod** and **DSLM-Map**  
+> based on [Hamann et al., Euro-Par 2018](https://doi.org/10.1007/978-3-319-96983-1_49)
+
+---
+
 ## Overview
 This project studies and implements the two distributed graph clustering algorithms proposed by Hamann et al. (2018):
 
